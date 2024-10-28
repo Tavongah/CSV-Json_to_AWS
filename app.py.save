@@ -1,0 +1,76 @@
+from flask import Flask, request, redirect, url_for, render_template, send_from_directory
+import pandas as pd
+import os
+import boto3
+from botocore.exceptions import ClientError
+from pymongo import MongoClient
+
+app = Flask(__name__)
+
+# Initialize DynamoDB resource
+dynamodb = boto3.resource('dynamodb')
+table_name = 'diabetes_risk_prediction_dataset'
+table = dynamodb.Table(table_name)
+
+# DocumentDB connection details
+docdb_uri = "mongodb://<username>:<password>@<cluster-endpoint>:27017/?ssl=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+client = MongoClient(docdb_uri)
+db = client['your_database_name']  # Replace with your database name
+collection = db['your_collection_name']  # Replace with your collection name
+
+def upload_to_dynamodb(dataframe):
+    for index, row in dataframe.iterrows():
+        item = row.to_dict()
+        try:
+            table.put_item(Item=item)
+        except ClientError as e:
+            print(f"Error uploading to DynamoDB: {e.response['Error']['Message']}")
+
+def upload_to_documentdb(dataframe):
+    for index, row in dataframe.iterrows():
+        item = row.to_dict()
+        try:
+            collection.insert_one(item)
+        except Exception as e:
+            print(f"Error uploading to DocumentDB: {e}")
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return redirect(request.url)
+    file = request.files['file']
+    if file.filename == '':
+        return redirect(request.url)
+
+    # Save the uploaded file
+    file_path = os.path.join('/tmp', file.filename)
+    file.save(file_path)
+
+    # Sanitize the CSV
+    try:
+        df = pd.read_csv(file_path)
+        df = df.drop_duplicates()
+        df = df.fillna('')
+        sanitized_file_path = os.path.join('/tmp', f'sanitized_{file.filename}')
+        df.to_csv(sanitized_file_path, index=False)
+
+        # Upload to DynamoDB
+        upload_to_dynamodb(df)
+
+        # Upload to DocumentDB
+        upload_to_documentdb(df)
+
+        return f'Sanitized file saved as: <a href="{url_for("download_file", filename=f"sanitized_{file.filename}")}">Download</a>'
+    except Exception as e:
+        return str(e)
+
+@app.route('/download/<filename>')
+def download_file(filename):
+    return send_from_directory('/tmp', filename)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
