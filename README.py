@@ -1,29 +1,28 @@
 # CSV-Json_to_AWS
-Flask Application for CSV Data Upload to AWS Services
+#Flask Application for CSV Data Upload to AWS Services
 This Flask application provides a web interface to upload CSV files, process the data, and upload it to multiple AWS services, including RDS MySQL, DynamoDB, MongoDB, and Neptune.
 
-Features
-Upload CSV Data to AWS RDS MySQL: Inserts data into an existing database and table in MySQL hosted on Amazon RDS.
-Integration with AWS DynamoDB: Uploads records to DynamoDB for fast NoSQL storage.
-Integration with MongoDB: Uploads records to a MongoDB instance.
-Integration with AWS Neptune: Inserts data into a Neptune graph database.
+#Features
+#Upload CSV Data to AWS RDS MySQL: Inserts data into an existing database and table in MySQL hosted on Amazon RDS.
+#Integration with AWS DynamoDB: Uploads records to DynamoDB for fast NoSQL storage.
+#Integration with MongoDB: Uploads records to a MongoDB instance.
+#Integration with AWS Neptune: Inserts data into a Neptune graph database.
 Prerequisites
-AWS Account: For RDS, DynamoDB, and Neptune.
-MongoDB Instance: A DocumentDB or MongoDB instance (self-hosted or on a service).
-Python 3.6+: This application uses Python 3 and requires specific packages listed in requirements.txt.
+#AWS Account: For RDS, DynamoDB, and Neptune.
+#MongoDB Instance: A DocumentDB or MongoDB instance (self-hosted or on a service).
+#Python 3.6+: This application uses Python 3 and requires specific packages listed in requirements.txt.
 Setup
 
-Set Up Environment Variables
-The application requires environment variables for DynamoDB and Neptune configuration. Set these in your environment or create a .env file:
+#Set Up Environment Variables
+#The application requires environment variables for DynamoDB and Neptune configuration. Set these in your environment or #create a .env file:
 
 export DYNAMODB_TABLE_NAME="your_dynamo_table_name"
 export NEPTUNE_ENDPOINT="your_neptune_endpoint"
-3. Install Dependencies
-bash
-Copy code
-pip install -r requirements.txt
-4. Update RDS, MongoDB, and AWS Credentials
-Edit the application code in app.py and provide your RDS endpoint, MongoDB URI, and AWS credentials:
+
+#3. Install Dependencies
+#pip install -r requirements.txt
+#4. Update RDS, MongoDB, and AWS Credentials
+#Edit the application code in app.py and provide your RDS endpoint, MongoDB URI, and AWS credentials:
 
 python
 # RDS Configuration
